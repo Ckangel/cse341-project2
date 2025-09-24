@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const gardenController = require("../controllers/gardenController");
 const validateGarden = require("../middleware/validateGarden");
-const ensureAuth = require("../middleware/ensureAuth"); // assumes OAuth middleware
+const ensureAuth = require("../middleware/ensureAuth");
 
 router.use(ensureAuth);
 
@@ -12,4 +12,4 @@ router.post("/", validateGarden, gardenController.createGarden);
 router.put("/:id", validateGarden, gardenController.updateGarden);
 router.delete("/:id", gardenController.deleteGarden);
 
-module.exports = router;
+module.exports = router; // ✅ This line is critical
