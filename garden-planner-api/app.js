@@ -12,9 +12,12 @@ app.use(express.json());
 
 // Routes
 app.use("/api/gardens", gardenRoutes);
-//  app.use("/api/gardens", (req, res) => res.send("Garden route works"));
-app.use("/auth", authRoutes);
-app.use("/test", (req, res) => res.send("Test route works"));
+
+app.use("/api/gardens", (req, res) => res.send("Garden route works"));
+
+//  app.use("/auth", authRoutes);
+
+app.use("/test", (req, res) => res.send("✅Test route works"));
 
 // Error handling
 app.use(errorHandler);
