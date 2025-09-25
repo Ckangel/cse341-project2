@@ -1,4 +1,4 @@
-const Garden = require('../models/Garden');
+const Garden = require("../models/Garden");
 
 // CREATE
 exports.createGarden = async (req, res, next) => {
@@ -24,8 +24,12 @@ exports.getGardens = async (req, res, next) => {
 // READ ONE
 exports.getGardenById = async (req, res, next) => {
   try {
-    const garden = await Garden.findOne({ _id: req.params.id, ownerId: req.user._id });
-    if (!garden) return res.status(404).json({ error: 'Garden not found' });
+    const garden = await Garden.findOne({
+      _id: req.params.id,
+      ownerId: req.user._id,
+    });
+
+    if (!garden) return res.status(404).json({ error: "Garden not found" });
     res.json(garden);
   } catch (err) {
     next(err);
@@ -40,7 +44,10 @@ exports.updateGarden = async (req, res, next) => {
       req.body,
       { new: true, runValidators: true }
     );
-    if (!updated) return res.status(404).json({ error: 'Garden not found or unauthorized' });
+    if (!updated)
+      return res
+        .status(404)
+        .json({ error: "Garden not found or unauthorized" });
     res.json(updated);
   } catch (err) {
     next(err);
@@ -50,10 +57,32 @@ exports.updateGarden = async (req, res, next) => {
 // DELETE
 exports.deleteGarden = async (req, res, next) => {
   try {
-    const deleted = await Garden.findOneAndDelete({ _id: req.params.id, ownerId: req.user._id });
-    if (!deleted) return res.status(404).json({ error: 'Garden not found or unauthorized' });
-    res.json({ message: 'Garden deleted successfully' });
+    const deleted = await Garden.findOneAndDelete({
+      _id: req.params.id,
+      ownerId: req.user._id,
+    });
+    if (!deleted)
+      return res
+        .status(404)
+        .json({ error: "Garden not found or unauthorized" });
+    res.json({ message: "Garden deleted successfully" });
   } catch (err) {
     next(err);
   }
+};
+
+exports.getGardens = async (req, res, next) => {
+  /* ... */
+};
+exports.getGardenById = async (req, res, next) => {
+  /* ... */
+};
+exports.createGarden = async (req, res, next) => {
+  /* ... */
+};
+exports.updateGarden = async (req, res, next) => {
+  /* ... */
+};
+exports.deleteGarden = async (req, res, next) => {
+  /* ... */
 };
