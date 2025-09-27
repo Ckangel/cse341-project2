@@ -11,6 +11,7 @@
     "passport-google-oauth20": "^2.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
+    "main": "server.js",
     "scripts": {
-      "start": "node garden-planner-api/server.js",
+      "start": "node server.js"
     }
