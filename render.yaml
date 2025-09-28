@@ -10,6 +10,8 @@ services:
         value: 22.16.0
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
       - key: MONGO_URI
         sync: false
       - key: GOOGLE_CLIENT_ID
@@ -22,3 +24,8 @@ services:
         sync: false
       - key: BASE_URL
         sync: false
+      - key: JWT_SECRET
+        sync: false
+    healthCheckPath: /api/health
+    autoDeploy: true
+    deployOnPush: true

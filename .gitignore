@@ -1,21 +1,51 @@
-# Node
+# Node.js dependencies
 node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-
-# Env files
-.env
-.env.local
-.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # Logs
 logs
 *.log
+logs/*.log
+
+# Runtime data
 pids
 *.pid
 *.seed
+*.pid.lock
 
-# OS
+# Coverage directories
+coverage/
+.nyc_output/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build and cache
+dist/
+build/
+.cache/
+.next/
+out/
+
+# IDE/editor junk
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Lock files (optional, since we’re using yarn on Render)
+package-lock.json

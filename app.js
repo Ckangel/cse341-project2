@@ -28,4 +28,10 @@ mongoose
     process.exit(1);
   });
 
+//  Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+  message: "Garden Planner API is healthy";
+});
+
 module.exports = app;
