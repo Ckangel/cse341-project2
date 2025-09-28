@@ -1,11 +1,19 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const gardenController = require("../controllers/gardenController");
-const validateGarden = require("../middleware/validateGarden");
-const ensureAuth = require("../middleware/ensureAuth");
+// Controllers
+const gardenController = require('../controllers/gardenController');
 
-router.use(ensureAuth);
+// Middlewares
+const validate = require('../middlewares/validate');
+const auth = require('../middlewares/auth');
+
+/**
+ * @swagger
+ * tags:
+ *   name: Gardens
+ *   description: Garden management and CRUD operations
+ */
 
 /**
  * @swagger
@@ -15,11 +23,8 @@ router.use(ensureAuth);
  *     tags: [Gardens]
  *     responses:
  *       200:
- *         description: A list of gardens
- *       401:
- *         description: Unauthorized
+ *         description: List of gardens
  */
-router.get("/", gardenController.getGardens);
 
 /**
  * @swagger
@@ -30,18 +35,16 @@ router.get("/", gardenController.getGardens);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
+ *         description: The garden ID
  *     responses:
  *       200:
- *         description: Garden found
+ *         description: Garden object
  *       404:
  *         description: Garden not found
- *       401:
- *         description: Unauthorized
  */
-router.get("/:id", gardenController.getGardenById);
 
 /**
  * @swagger
@@ -54,16 +57,21 @@ router.get("/:id", gardenController.getGardenById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Garden'
+ *             type: object
+ *             properties:
+ *               name: { type: string }
+ *               location: { type: string }
+ *               size: { type: number }
+ *               soilType: { type: string }
+ *               plants: { type: array, items: { type: string } }
+ *               createdAt: { type: string, format: date-time }
+ *               updatedAt: { type: string, format: date-time }
  *     responses:
  *       201:
  *         description: Garden created
  *       400:
  *         description: Validation error
- *       401:
- *         description: Unauthorized
  */
-router.post("/", validateGarden, gardenController.createGarden);
 
 /**
  * @swagger
@@ -74,26 +82,21 @@ router.post("/", validateGarden, gardenController.createGarden);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Garden'
+ *             type: object
  *     responses:
  *       200:
- *         description: Garden updated successfully
- *       400:
- *         description: Validation error
- *       500:
- *         description: Server error
- *       401:
- *         description: Unauthorized
+ *         description: Garden updated
+ *       404:
+ *         description: Garden not found
  */
-router.put("/:id", validateGarden, gardenController.updateGarden);
 
 /**
  * @swagger
@@ -104,17 +107,21 @@ router.put("/:id", validateGarden, gardenController.updateGarden);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
  *     responses:
  *       200:
- *         description: Garden deleted successfully
- *       500:
- *         description: Server error
- *       401:
- *         description: Unauthorized
+ *         description: Garden deleted
+ *       404:
+ *         description: Garden not found
  */
-router.delete("/:id", gardenController.deleteGarden);
+
+// Garden routes
+router.get('/', auth, gardenController.getAllGardens);
+router.get('/:id', auth, gardenController.getGardenById);
+router.post('/', auth, validate, gardenController.createGarden);
+router.put('/:id', auth, validate, gardenController.updateGarden);
+router.delete('/:id', auth, gardenController.deleteGarden);
 
 module.exports = router;

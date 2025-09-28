@@ -1,26 +1,57 @@
 const express = require("express");
-const passport = require("passport");
 const router = express.Router();
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+// Controllers
+const authController = require("../controllers/authController");
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/auth/failure",
-    successRedirect: "/auth/success",
-  })
-);
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication and OAuth operations
+ */
 
-router.get("/success", (req, res) => {
-  res.json({ message: "Login successful", user: req.user });
-});
+/**
+ * @swagger
+ * /api/auth/google:
+ *   get:
+ *     summary: Start Google OAuth login
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to Google login
+ */
 
-router.get("/failure", (req, res) => {
-  res.status(401).json({ error: "Login failed" });
-});
+/**
+ * @swagger
+ * /api/auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: OAuth successful, user logged in
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   get:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: User logged out
+ */
+
+// Auth routes
+router.post("/register", authController.registerUser);
+router.post("/login", authController.loginUser);
+router.post("/logout", authController.logoutUser);
+
+// Optional: refresh token
+router.post("/refresh-token", authController.refreshToken);
 
 module.exports = router;

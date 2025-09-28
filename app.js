@@ -1,11 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
-// Only load dotenv in local/dev, not in Render (Render injects env vars directly)
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger"); // we'll create this file
+require("dotenv").config();
 
 const app = express();
 
@@ -13,20 +11,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes (update path to routes inside garden-planner-api)
-const gardenRoutes = require("./garden-planner-api/routes/gardenRoutes");
-app.use("/api/garden", gardenRoutes);
+// Routes
+app.use("/api/users", require("./garden-planner-api/routes/userRoutes"));
+app.use("/api/gardens", require("./garden-planner-api/routes/gardenRoutes"));
+app.use("/api/auth", require("./garden-planner-api/routes/authRoutes"));
 
-// MongoDB connection
-const mongoUri = process.env.MONGO_URI;
-if (!mongoUri) {
-  console.error("❌ No MongoDB URI found in environment variables");
-  process.exit(1);
-}
+// Swagger docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// MongoDB Connection
 mongoose
-  .connect(mongoUri)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 module.exports = app;

@@ -1,11 +1,19 @@
 const express = require("express");
 const router = express.Router();
 
+// Controllers
 const userController = require("../controllers/userController");
-const validateUser = require("../middleware/validateUser");
-const ensureAuth = require("../middleware/ensureAuth");
 
-router.use(ensureAuth);
+// Middlewares (stubbed, replace with real implementations later)
+const validate = require("../middlewares/validate");
+const auth = require("../middlewares/auth");
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management and CRUD operations
+ */
 
 /**
  * @swagger
@@ -15,9 +23,8 @@ router.use(ensureAuth);
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: A list of users
+ *         description: List of users
  */
-router.get("/", userController.getAllUsers);
 
 /**
  * @swagger
@@ -28,16 +35,16 @@ router.get("/", userController.getAllUsers);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
+ *         description: The user ID
  *     responses:
  *       200:
- *         description: User found
+ *         description: User object
  *       404:
  *         description: User not found
  */
-router.get("/:id", userController.getUserById);
 
 /**
  * @swagger
@@ -50,14 +57,20 @@ router.get("/:id", userController.getUserById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       201:
  *         description: User created
  *       400:
  *         description: Validation error
  */
-router.post("/", validateUser, userController.createUser);
 
 /**
  * @swagger
@@ -68,24 +81,21 @@ router.post("/", validateUser, userController.createUser);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
  *     responses:
  *       200:
  *         description: User updated
- *       400:
- *         description: Validation error
- *       500:
- *         description: Server error
+ *       404:
+ *         description: User not found
  */
-router.put("/:id", validateUser, userController.updateUser);
 
 /**
  * @swagger
@@ -96,15 +106,21 @@ router.put("/:id", validateUser, userController.updateUser);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
  *     responses:
  *       200:
  *         description: User deleted
- *       500:
- *         description: Server error
+ *       404:
+ *         description: User not found
  */
-router.delete("/:id", userController.deleteUser);
+
+// User routes
+router.get("/", auth, userController.getAllUsers);
+router.get("/:id", auth, userController.getUserById);
+router.post("/", validate, userController.createUser);
+router.put("/:id", validate, userController.updateUser);
+router.delete("/:id", auth, userController.deleteUser);
 
 module.exports = router;

@@ -1,40 +1,45 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const User = require("../models/User");
+const User = require("../models/userModel");
 
-console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID);
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id).exec();
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
 
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      callbackURL:
+        process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ providerId: profile.id });
+        // Find or create user
+        let user = await User.findOne({ googleId: profile.id });
         if (!user) {
           user = await User.create({
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            provider: "google",
-            providerId: profile.id,
+            googleId: profile.id,
+            email: (profile.emails && profile.emails[0].value) || "",
+            displayName: profile.displayName || "",
+            firstName: (profile.name && profile.name.givenName) || "",
+            lastName: (profile.name && profile.name.familyName) || "",
+            role: "user",
           });
         }
-        done(null, user);
+        return done(null, user);
       } catch (err) {
-        done(err, null);
+        return done(err);
       }
     }
   )
 );
-
-passport.serializeUser((user, done) => {
-  done(null, user._id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
-});
