@@ -17,7 +17,7 @@ router.use(ensureAuth);
  *       200:
  *         description: A list of users
  */
-router.get("/", userController.getUsers);
+router.get("/", userController.getAllUsers);
 
 /**
  * @swagger

@@ -10,3 +10,11 @@ services:
         value: 22.16.0
       - key: NODE_ENV
         value: production
+      - key: MONGO_URI
+        sync: false # set this in Render Dashboard
+      - key: GOOGLE_CLIENT_ID
+        sync: false # set this in Render Dashboard
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false # set this in Render Dashboard
+      - key: SESSION_SECRET
+        sync: false # set this in Render Dashboard

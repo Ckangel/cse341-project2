@@ -12,7 +12,7 @@ exports.createGarden = async (req, res, next) => {
 };
 
 // READ ALL
-exports.getGardens = async (req, res, next) => {
+exports.getAllGardens = async (req, res, next) => {
   try {
     const gardens = await Garden.find({ ownerId: req.user._id });
     res.json(gardens);
