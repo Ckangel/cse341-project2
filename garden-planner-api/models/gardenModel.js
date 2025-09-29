@@ -1,22 +1,44 @@
-// gardenModel.js
 const mongoose = require("mongoose");
 
-const gardenSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    location: { type: String },
-    size: { type: Number }, // in sq meters
-    plants: [{ type: String }],
-    soilType: { type: String },
-    lastWateredAt: { type: Date },
-    notes: { type: String },
+const mongoose = require('mongoose');
+
+const gardenSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
   },
-  { timestamps: true }
-);
+  layout: {
+    type: String,
+    enum: ['grid', 'rows', 'freeform'], // optional: restrict layout types
+    required: true,
+  },
+  plantTypes: {
+    type: [String],
+    default: [],
+  },
+  wateringSchedule: {
+    type: String,
+    required: true,
+  },
+  sunlightNeeds: {
+    type: String,
+    required: true,
+  },
+  soilType: {
+    type: String,
+    required: true,
+  },
+  notes: {
+    type: String,
+  },
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+}, { timestamps: true });
+
+module.exports = mongoose.model('Garden', gardenSchema);
+
 
 module.exports = mongoose.model("Garden", gardenSchema);

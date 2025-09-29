@@ -1,4 +1,3 @@
-// swagger.js
 const swaggerJSDoc = require("swagger-jsdoc");
 
 const options = {
@@ -7,7 +6,7 @@ const options = {
     info: {
       title: "Garden Planner API",
       version: "1.0.0",
-      description: "API documentation for Garden Planner project",
+      description: "API documentation for Garden Planner",
     },
     servers: [
       {
@@ -15,30 +14,13 @@ const options = {
         description: "Local server",
       },
       {
-        url: "https://cse341-project2-1-xl43.onrender.com",
+        url: "https://cse341-project2-8cpj.onrender.com",
         description: "Production server",
       },
     ],
   },
-  apis: ["./garden-planner-api/routes/*.js"], // swagger will scan route files
+  apis: ["./garden-planner-api/routes/*.js"], // adjust path if needed
 };
 
 const swaggerSpec = swaggerJSDoc(options);
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Garden Planner API",
-      version: "1.0.0",
-      description: "API for managing users, gardens, and authentication.",
-    },
-    servers: [
-      {
-        url: "http://localhost:5000", // 👈 matches your dev server
-      },
-    ],
-  },
-  apis: ["./garden-planner-api/routes/*.js"], // 👈 absolute/relative path matters
-};
-
 module.exports = swaggerSpec;
