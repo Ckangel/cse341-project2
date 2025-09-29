@@ -15,7 +15,7 @@ const options = {
         description: "Local server",
       },
       {
-        url: "https://your-render-service.onrender.com",
+        url: "https://cse341-project2-1-xl43.onrender.com",
         description: "Production server",
       },
     ],
