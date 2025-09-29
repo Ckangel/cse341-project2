@@ -40,6 +40,15 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+//  DB Health Check Endpoint
+app.get("/api/db-status", (req, res) => {
+  const state = mongoose.connection.readyState;
+  const status = ["disconnected", "connected", "connecting", "disconnecting"][
+    state
+  ];
+  res.status(200).json({ status });
+});
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, {
