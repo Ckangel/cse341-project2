@@ -21,6 +21,7 @@ const authController = require("../controllers/authController");
  *       302:
  *         description: Redirects to Google login
  */
+router.post("/register", authController.registerUser);
 
 /**
  * @swagger
@@ -34,6 +35,7 @@ const authController = require("../controllers/authController");
  *       401:
  *         description: Unauthorized
  */
+router.post("/login", authController.loginUser);
 
 /**
  * @swagger
@@ -45,10 +47,6 @@ const authController = require("../controllers/authController");
  *       200:
  *         description: User logged out
  */
-
-// Auth routes
-router.post("/register", authController.registerUser);
-router.post("/login", authController.loginUser);
 router.post("/logout", authController.logoutUser);
 
 // Optional: refresh token

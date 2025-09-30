@@ -17,6 +17,45 @@ const auth = require("../middlewares/auth");
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: MongoDB ObjectId
+ *         googleId:
+ *           type: string
+ *         email:
+ *           type: string
+ *         displayName:
+ *           type: string
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
+ *         bio:
+ *           type: string
+ *         preferences:
+ *           type: object
+ *           properties:
+ *             notifications:
+ *               type: boolean
+ *             theme:
+ *               type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ */
+
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users
@@ -24,6 +63,12 @@ const auth = require("../middlewares/auth");
  *     responses:
  *       200:
  *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
  */
 router.get("/", auth, userController.getAllUsers);
 
@@ -43,6 +88,10 @@ router.get("/", auth, userController.getAllUsers);
  *     responses:
  *       200:
  *         description: User object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
  */
@@ -59,17 +108,14 @@ router.get("/:id", auth, userController.getUserById);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
  *         description: User created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Validation error
  */
@@ -87,15 +133,20 @@ router.post("/", validate, userController.createUser);
  *         schema:
  *           type: string
  *         required: true
+ *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: User updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
  */
@@ -113,6 +164,7 @@ router.put("/:id", validate, userController.updateUser);
  *         schema:
  *           type: string
  *         required: true
+ *         description: The user ID
  *     responses:
  *       200:
  *         description: User deleted
