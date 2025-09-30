@@ -4,7 +4,7 @@ const router = express.Router();
 // Controllers
 const userController = require("../controllers/userController");
 
-// Middlewares (stubbed, replace with real implementations later)
+// Middlewares
 const validate = require("../middlewares/validate");
 const auth = require("../middlewares/auth");
 
@@ -25,6 +25,7 @@ const auth = require("../middlewares/auth");
  *       200:
  *         description: List of users
  */
+router.get("/", auth, userController.getAllUsers);
 
 /**
  * @swagger
@@ -45,6 +46,7 @@ const auth = require("../middlewares/auth");
  *       404:
  *         description: User not found
  */
+router.get("/:id", auth, userController.getUserById);
 
 /**
  * @swagger
@@ -71,6 +73,7 @@ const auth = require("../middlewares/auth");
  *       400:
  *         description: Validation error
  */
+router.post("/", validate, userController.createUser);
 
 /**
  * @swagger
@@ -96,6 +99,7 @@ const auth = require("../middlewares/auth");
  *       404:
  *         description: User not found
  */
+router.put("/:id", validate, userController.updateUser);
 
 /**
  * @swagger
@@ -115,12 +119,6 @@ const auth = require("../middlewares/auth");
  *       404:
  *         description: User not found
  */
-
-// User routes
-router.get("/", auth, userController.getAllUsers);
-router.get("/:id", auth, userController.getUserById);
-router.post("/", validate, userController.createUser);
-router.put("/:id", validate, userController.updateUser);
 router.delete("/:id", auth, userController.deleteUser);
 
 module.exports = router;
