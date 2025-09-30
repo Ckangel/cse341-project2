@@ -11,7 +11,7 @@ const gardenController = require("../controllers/gardenController");
 
 /**
  * @swagger
- * /api/gardens:
+ * /api/garden:
  *   get:
  *     summary: Get all gardens
  *     tags: [Gardens]
@@ -19,6 +19,7 @@ const gardenController = require("../controllers/gardenController");
  *       200:
  *         description: List of gardens
  */
+console.log(gardenController);
 router.get("/", gardenController.getAllGardens);
 
 /**
