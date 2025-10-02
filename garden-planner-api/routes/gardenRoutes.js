@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const gardenController = require("../controllers/gardenController");
+const ensureAuth = require("../../middleware/ensureAuth");
+const ensureRole = require("../../middleware/ensureRole");
 
 /**
  * @swagger
@@ -9,9 +11,18 @@ const gardenController = require("../controllers/gardenController");
  *   description: Garden management
  */
 
+// Protected routes first
+router.get("/private", ensureAuth, (req, res) => {
+  res.json({ message: "This is a protected garden view", user: req.user });
+});
+
+router.post("/add", ensureAuth, ensureRole("admin"), (req, res) => {
+  res.json({ message: "Garden added successfully", data: req.body });
+});
+
 /**
  * @swagger
- * /api/garden:
+ * /api/gardens:
  *   get:
  *     summary: Get all gardens
  *     tags: [Gardens]
@@ -19,7 +30,6 @@ const gardenController = require("../controllers/gardenController");
  *       200:
  *         description: List of gardens
  */
-console.log(gardenController);
 router.get("/", gardenController.getAllGardens);
 
 /**
@@ -45,21 +55,18 @@ router.get("/:id", gardenController.getGardenById);
 
 /**
  * @swagger
- * /api/gardens:
+ * /api/gardens/add:
  *   post:
- *     summary: Create a new garden
+ *     summary: Create a garden (admin only)
  *     tags: [Gardens]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
- *               - location
- *               - size
- *               - soilType
  *             properties:
  *               name:
  *                 type: string
@@ -76,8 +83,10 @@ router.get("/:id", gardenController.getGardenById);
  *     responses:
  *       201:
  *         description: Garden created
- *       400:
- *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (admin only)
  */
 router.post("/", gardenController.createGarden);
 
@@ -125,8 +134,10 @@ router.put("/:id", gardenController.updateGarden);
  * @swagger
  * /api/gardens/{id}:
  *   delete:
- *     summary: Delete a garden by ID
+ *     summary: Delete a garden by ID (admin only)
  *     tags: [Gardens]
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -137,9 +148,18 @@ router.put("/:id", gardenController.updateGarden);
  *     responses:
  *       200:
  *         description: Garden deleted
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (admin only)
  *       404:
  *         description: Garden not found
  */
-router.delete("/:id", gardenController.deleteGarden);
+router.delete(
+  "/:id",
+  ensureAuth,
+  ensureRole("admin"),
+  gardenController.deleteGarden
+);
 
 module.exports = router;

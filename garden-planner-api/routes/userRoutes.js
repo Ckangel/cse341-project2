@@ -5,8 +5,8 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 
 // Middlewares
-const validate = require("../middlewares/validate");
-const auth = require("../middlewares/auth");
+const validate = require("../middleware/validate");
+const auth = require("../middleware/auth");
 
 /**
  * @swagger

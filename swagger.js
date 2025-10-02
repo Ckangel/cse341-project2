@@ -1,26 +1,35 @@
-const swaggerJSDoc = require("swagger-jsdoc");
-
-const options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Garden Planner API",
-      version: "1.0.0",
-      description: "API documentation for Garden Planner",
-    },
-    servers: [
-      {
-        url: "http://localhost:5000",
-        description: "Local server",
-      },
-      {
-        url: "https://cse341-project2-8cpj.onrender.com",
-        description: "Production server",
-      },
-    ],
+const swaggerSpec = {
+  openapi: "3.0.0",
+  info: {
+    title: "Garden Planner API",
+    version: "1.0.0",
+    description: "API documentation for the Garden Planner project",
   },
-  apis: ["./garden-planner-api/routes/*.js"], // adjust path if needed
+  components: {
+    securitySchemes: {
+      cookieAuth: {
+        type: "apiKey",
+        name: "connect.sid",
+        in: "cookie", // ✅ This must be inside an object key
+        name:"connect.sid"
+      },
+    },
+  },
+  security: [
+    {
+      cookieAuth: [],
+    },
+  ],
+
+
+  // ... other config like paths
 };
 
-const swaggerSpec = swaggerJSDoc(options);
+tags: [
+  {
+    name: "Auth Middleware",
+    description: "Middleware functions that protect routes based on authentication and user roles."
+  }
+]
+
 module.exports = swaggerSpec;

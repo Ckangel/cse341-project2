@@ -1,4 +1,4 @@
-const Garden = require("../models/Garden");
+const Garden = require("../models/gardenModel");
 
 // GET all gardens
 exports.getAllGardens = async (req, res) => {
