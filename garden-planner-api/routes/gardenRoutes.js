@@ -16,8 +16,9 @@ const ensureRole = require("../../middleware/ensureRole");
  * @swagger
  * /api/gardens:
  *   get:
- *     summary: Retrieve all gardens
+ *     summary: Retrieve all gardens (public)
  *     tags: [Gardens]
+ *     security: []  # no auth needed
  *     responses:
  *       200:
  *         description: List of all gardens
@@ -34,8 +35,9 @@ router.get("/", gardenController.getAllGardens);
  * @swagger
  * /api/gardens/{id}:
  *   get:
- *     summary: Get a garden by ID
+ *     summary: Get a garden by ID (public)
  *     tags: [Gardens]
+ *     security: []  # no auth needed
  *     parameters:
  *       - in: path
  *         name: id
@@ -147,44 +149,5 @@ router.delete(
   ensureRole("admin"),
   gardenController.deleteGarden
 );
-
-// Additional Protected Test Routes
-
-/**
- * @swagger
- * /api/gardens/private:
- *   get:
- *     summary: Example protected garden view
- *     tags: [Gardens]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Protected garden view
- */
-router.get("/private", ensureAuth, (req, res) => {
-  res.json({ message: "This is a protected garden view", user: req.user });
-});
-
-/**
- * @swagger
- * /api/gardens/add:
- *   post:
- *     summary: Example admin-only garden add
- *     tags: [Gardens]
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: Admin garden added
- */
-router.post("/add", ensureAuth, ensureRole("admin"), (req, res) => {
-  res.json({ message: "Garden added successfully", data: req.body });
-});
 
 module.exports = router;

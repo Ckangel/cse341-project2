@@ -7,22 +7,89 @@ const options = {
     info: {
       title: "Garden Planner API",
       version: "1.0.0",
-      description: "API documentation for Garden Planner Project",
+      description: "API documentation for the Garden Planner Project",
     },
     servers: [
       {
-        url: "http://localhost:5000", // For local development
+        url: "http://localhost:5000", // Local development
       },
       {
-        url: "https://cse341-project2-8cpj.onrender.com", // Your deployed URL
+        url: "https://cse341-project2-8cpj.onrender.com", // Production deployed URL
       },
     ],
+    components: {
+      schemas: {
+        User: {
+          type: "object",
+          properties: {
+            _id: { type: "string", description: "MongoDB ObjectId" },
+            googleId: { type: "string", nullable: true },
+            email: { type: "string" },
+            displayName: { type: "string", nullable: true },
+            firstName: { type: "string", nullable: true },
+            lastName: { type: "string", nullable: true },
+            role: { type: "string", enum: ["user", "admin"], default: "user" },
+            bio: { type: "string", nullable: true },
+            preferences: {
+              type: "object",
+              properties: {
+                notifications: { type: "boolean", default: true },
+                theme: { type: "string", default: "light" },
+              },
+            },
+            createdAt: { type: "string", format: "date-time" },
+          },
+          required: ["email"],
+        },
+
+        Garden: {
+          type: "object",
+          properties: {
+            _id: { type: "string", description: "MongoDB ObjectId" },
+            name: { type: "string" },
+            location: { type: "string" },
+            size: { type: "number" },
+            soilType: { type: "string" },
+            plants: {
+              type: "array",
+              items: { type: "string" },
+            },
+            createdAt: { type: "string", format: "date-time" },
+          },
+          required: ["name", "location", "size", "soilType"],
+        },
+
+        GardenInput: {
+          type: "object",
+          required: ["name", "location", "size", "soilType"],
+          properties: {
+            name: { type: "string" },
+            location: { type: "string" },
+            size: { type: "number" },
+            soilType: { type: "string" },
+            plants: {
+              type: "array",
+              items: { type: "string" },
+            },
+          },
+        },
+      },
+
+      securitySchemes: {
+        cookieAuth: {
+          type: "apiKey",
+          in: "cookie",
+          name: "token",
+        },
+      },
+    },
   },
+
   apis: [
-    "./garden-planner-api/routes/*.js",
-    "./garden-planner-api/controllers/*.js",
+    path.join(__dirname, "./garden-planner-api/routes/*.js"),
+    path.join(__dirname, "./garden-planner-api/controllers/*.js"),
   ],
 };
-const swaggerSpec = swaggerJsdoc(options);
 
+const swaggerSpec = swaggerJsdoc(options);
 module.exports = swaggerSpec;
