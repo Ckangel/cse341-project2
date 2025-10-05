@@ -40,6 +40,9 @@ app.use(
 );
 app.use(express.json());
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 // Routes
 app.use("/api/users", require("./garden-planner-api/routes/userRoutes"));
 app.use("/api/gardens", require("./garden-planner-api/routes/gardenRoutes"));

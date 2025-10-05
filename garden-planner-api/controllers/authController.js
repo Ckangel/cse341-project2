@@ -1,68 +1,88 @@
-const User = require('../models/userModel');
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const User = require("../models/userModel"); // Adjust path if needed
 
-// Register
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
+const JWT_EXPIRES_IN = "1d"; // 1 day expiration
+const SALT_ROUNDS = 10; // bcrypt salt rounds
+
+// Register new user (with password hashing)
 exports.registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    const existing = await User.findOne({ email });
-    if (existing)
-      return res.status(400).json({ error: "Email already in use" });
+    const { email, password, displayName, firstName, lastName } = req.body;
 
-    const user = new User({ username, email, password });
-    await user.save();
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
 
-    res.status(201).json({
-      message: "User registered",
-      user: { id: user._id, username, email },
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+    // Create new user
+    const newUser = new User({
+      email,
+      password: hashedPassword, // store hashed password
+      displayName,
+      firstName,
+      lastName,
+      role: "user",
     });
+
+    await newUser.save();
+
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Registration error:", err);
+    res.status(500).json({ message: "Server error during registration" });
   }
 };
 
-// Login
+// Login user and set JWT token cookie
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Find user by email
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+    // Compare password
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    // Create JWT payload
+    const payload = {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    };
 
-    res.status(200).json({ message: "Login successful", token });
+    // Sign token
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+    // Set httpOnly cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ message: "Login successful" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error during login" });
   }
 };
 
-// Logout (client-side token discard)
+// Logout user by clearing cookie
 exports.logoutUser = (req, res) => {
-  res.status(200).json({ message: "Logout successful" });
-};
-
-// Refresh token (optional)
-exports.refreshToken = (req, res) => {
-  const oldToken = req.headers.authorization?.split(" ")[1];
-  if (!oldToken) return res.status(401).json({ error: "No token provided" });
-
-  try {
-    const payload = jwt.verify(oldToken, process.env.JWT_SECRET);
-    const newToken = jwt.sign(
-      { id: payload.id, role: payload.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-    res.status(200).json({ token: newToken });
-  } catch (err) {
-    res.status(403).json({ error: "Invalid or expired token" });
-  }
+  res.clearCookie("token");
+  res.json({ message: "Logged out successfully" });
 };

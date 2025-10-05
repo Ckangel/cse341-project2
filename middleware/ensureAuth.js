@@ -1,31 +1,20 @@
-/**
- * @swagger
- * /api/middleware/ensure-auth:
- *   get:
- *     summary: Authenticated access only
- *     tags: [Auth Middleware]
- *     security:
- *       - cookieAuth: []
- *     description: |
- *       This route is protected by `ensureAuth` middleware. It requires the user to be logged in.
- *       If not authenticated, the server responds with 401 Unauthorized.
- *     responses:
- *       200:
- *         description: Access granted
- *       401:
- *         description: Unauthorized
- */
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
 
-/**
- * Middleware to ensure user is authenticated.
- * If authenticated, calls next middleware/route handler.
- * Otherwise, responds with 401 Unauthorized error.
- */
-function ensureAuth(req, res, next) {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    return next();
+const ensureAuth = (req, res, next) => {
+  const token = req.cookies?.token;
+
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
   }
-  res.status(401).json({ error: "Unauthorized: Please log in first." });
-}
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // attach user info to request
+    next();
+  } catch (err) {
+    res.status(401).json({ error: "Unauthorized: Invalid token" });
+  }
+};
 
 module.exports = ensureAuth;
