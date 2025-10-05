@@ -9,6 +9,11 @@ const swaggerSpec = require("./swagger");
 
 const app = express();
 
+const path = require("path");
+app.get("/swagger.json", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "swagger_output.json"));
+});
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI, {

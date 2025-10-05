@@ -1,8 +1,9 @@
 const fs = require("fs");
 const path = require("path");
-const swaggerSpec = require("../swagger"); // Adjust path accordingly
+const swaggerSpec = require("../swagger"); // Adjust the path to your swagger.js file accordingly
 
-const outputPath = path.resolve(__dirname, "../swagger_output.json");
+const outputFile = path.join(__dirname, "../swagger_output.json");
 
-fs.writeFileSync(outputPath, JSON.stringify(swaggerSpec, null, 2));
-console.log(`Swagger JSON written to ${outputPath}`);
+fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2), "utf-8");
+
+console.log(`Swagger JSON successfully generated at ${outputFile}`);
