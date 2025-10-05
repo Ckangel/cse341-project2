@@ -151,48 +151,6 @@
     }
   },
   "paths": {
-    "/api/auth/google": {
-      "get": {
-        "summary": "Start Google OAuth login",
-        "tags": [
-          "Auth"
-        ],
-        "responses": {
-          "302": {
-            "description": "Redirects to Google login"
-          }
-        }
-      }
-    },
-    "/api/auth/google/callback": {
-      "get": {
-        "summary": "Google OAuth callback",
-        "tags": [
-          "Auth"
-        ],
-        "responses": {
-          "200": {
-            "description": "OAuth successful, user logged in"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/auth/logout": {
-      "get": {
-        "summary": "Logout user",
-        "tags": [
-          "Auth"
-        ],
-        "responses": {
-          "200": {
-            "description": "User logged out"
-          }
-        }
-      }
-    },
     "/api/gardens": {
       "get": {
         "summary": "Retrieve all gardens (public)",
@@ -396,6 +354,37 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
       }
     },
     "/api/users/{id}": {
@@ -431,14 +420,77 @@
             "description": "User not found"
           }
         }
+      },
+      "put": {
+        "summary": "Update a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
       }
     }
   },
   "tags": [
-    {
-      "name": "Auth",
-      "description": "Authentication and OAuth operations"
-    },
     {
       "name": "Gardens",
       "description": "Garden management"
