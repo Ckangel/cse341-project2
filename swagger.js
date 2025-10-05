@@ -19,12 +19,10 @@ const options = {
     ],
   },
   apis: [
-    path.join(__dirname, "./garden-planner-api/routes/*.js"),
-    path.join(__dirname, "./garden-planner-api/controllers/*.js"),
-    // Add other paths with swagger comments if needed
+    "./garden-planner-api/routes/*.js",
+    "./garden-planner-api/controllers/*.js",
   ],
 };
-
 const swaggerSpec = swaggerJsdoc(options);
 
 module.exports = swaggerSpec;
