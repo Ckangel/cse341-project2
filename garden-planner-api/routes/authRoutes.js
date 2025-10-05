@@ -52,4 +52,10 @@ router.post("/logout", authController.logoutUser);
 // Optional: refresh token
 router.post("/refresh-token", authController.refreshToken);
 
+const verifyGoogleToken = require("../../middleware/Auth");
+
+router.get("/secure", verifyGoogleToken, (req, res) => {
+  res.json({ message: "Secure route accessed", user: req.user });
+});
+
 module.exports = router;

@@ -15,13 +15,17 @@
  *       401:
  *         description: Unauthorized
  */
-router.get("/middleware/ensure-auth", ensureAuth, (req, res) => {
-  res.json({ message: "Authenticated access granted" });
-});
 
-// module.exports = function ensureAuth(req, res, next) {
-//  if (req.isAuthenticated()) {
-//    return next();
-// }
-//  res.status(401).json({ error: "Unauthorized: Please log in first." });
-//  };
+/**
+ * Middleware to ensure user is authenticated.
+ * If authenticated, calls next middleware/route handler.
+ * Otherwise, responds with 401 Unauthorized error.
+ */
+function ensureAuth(req, res, next) {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ error: "Unauthorized: Please log in first." });
+}
+
+module.exports = ensureAuth;

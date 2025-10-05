@@ -1,13 +1,11 @@
-console.log("App initialized");
+require("dotenv").config();
+console.log("🌱 Garden Planner API initializing...");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const session = require("express-session");
-const passport = require("passport");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
-
-require("dotenv").config();
 
 const app = express();
 
@@ -37,29 +35,16 @@ app.use(
 );
 app.use(express.json());
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "fallback-secret",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Routes
 app.use("/api/users", require("./garden-planner-api/routes/userRoutes"));
 app.use("/api/gardens", require("./garden-planner-api/routes/gardenRoutes"));
 app.use("/api/auth", require("./garden-planner-api/routes/authRoutes"));
 
-// Swagger UI
+// Swagger UI and swagger.json endpoint
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get("/swagger.json", (req, res) => {
-  res.status(200).json(swaggerSpec);
-});
+app.get("/swagger.json", (req, res) => res.status(200).json(swaggerSpec));
 
-// Health check
+// Health Checks
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "OK",
@@ -68,15 +53,12 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// DB Health Check
 app.get("/api/db-status", (req, res) => {
-  const state = mongoose.connection.readyState;
-  const status = ["disconnected", "connected", "connecting", "disconnecting"][
-    state
-  ];
-  res.status(200).json({ status });
+  const states = ["disconnected", "connected", "connecting", "disconnecting"];
+  res.status(200).json({ status: states[mongoose.connection.readyState] });
 });
 
+// Global error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({ error: "Internal Server Error" });

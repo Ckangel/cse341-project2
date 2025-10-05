@@ -1,35 +1,30 @@
-const swaggerSpec = {
-  openapi: "3.0.0",
-  info: {
-    title: "Garden Planner API",
-    version: "1.0.0",
-    description: "API documentation for the Garden Planner project",
-  },
-  components: {
-    securitySchemes: {
-      cookieAuth: {
-        type: "apiKey",
-        name: "connect.sid",
-        in: "cookie", // ✅ This must be inside an object key
-        name:"connect.sid"
+const swaggerJsdoc = require("swagger-jsdoc");
+const path = require("path");
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Garden Planner API",
+      version: "1.0.0",
+      description: "API documentation for Garden Planner Project",
+    },
+    servers: [
+      {
+        url: "http://localhost:5000", // For local development
       },
-    },
+      {
+        url: "https://cse341-project2-8cpj.onrender.com", // Your deployed URL
+      },
+    ],
   },
-  security: [
-    {
-      cookieAuth: [],
-    },
+  apis: [
+    path.join(__dirname, "./garden-planner-api/routes/*.js"),
+    path.join(__dirname, "./garden-planner-api/controllers/*.js"),
+    // Add other paths with swagger comments if needed
   ],
-
-
-  // ... other config like paths
 };
 
-tags: [
-  {
-    name: "Auth Middleware",
-    description: "Middleware functions that protect routes based on authentication and user roles."
-  }
-]
+const swaggerSpec = swaggerJsdoc(options);
 
 module.exports = swaggerSpec;

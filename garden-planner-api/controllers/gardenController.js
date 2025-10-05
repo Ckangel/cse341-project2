@@ -10,18 +10,20 @@ exports.getAllGardens = async (req, res) => {
   }
 };
 
-// GET single garden
+// GET a single garden by ID
 exports.getGardenById = async (req, res) => {
   try {
     const garden = await Garden.findById(req.params.id);
-    if (!garden) return res.status(404).json({ error: "Garden not found" });
+    if (!garden) {
+      return res.status(404).json({ error: "Garden not found" });
+    }
     res.status(200).json(garden);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// POST create new garden
+// POST create a new garden
 exports.createGarden = async (req, res) => {
   try {
     const garden = new Garden(req.body);
@@ -32,25 +34,29 @@ exports.createGarden = async (req, res) => {
   }
 };
 
-// PUT update garden
+// PUT update a garden by ID
 exports.updateGarden = async (req, res) => {
   try {
     const garden = await Garden.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-    if (!garden) return res.status(404).json({ error: "Garden not found" });
+    if (!garden) {
+      return res.status(404).json({ error: "Garden not found" });
+    }
     res.status(200).json(garden);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
-// DELETE garden
+// DELETE a garden by ID
 exports.deleteGarden = async (req, res) => {
   try {
     const garden = await Garden.findByIdAndDelete(req.params.id);
-    if (!garden) return res.status(404).json({ error: "Garden not found" });
+    if (!garden) {
+      return res.status(404).json({ error: "Garden not found" });
+    }
     res.status(200).json({ message: "Garden deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });

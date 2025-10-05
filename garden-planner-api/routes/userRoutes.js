@@ -1,12 +1,16 @@
+console.log("🔗 Binding PUT /api/users/:id to updateUser");
+
 const express = require("express");
 const router = express.Router();
 
-// Controllers
+// Middleware
+const ensureAuth = require("../../middleware/Auth");
+const validate = require("../../middleware/validate");
+
+// Controller
 const userController = require("../controllers/userController");
 
-// Middlewares
-const validate = require("../middleware/validate");
-const auth = require("../middleware/auth");
+console.log("userController methods:", Object.keys(userController));
 
 /**
  * @swagger
@@ -54,12 +58,19 @@ const auth = require("../middleware/auth");
  *           format: date-time
  */
 
+// 🔐 Authenticated routes
+router.get("/profile", ensureAuth, userController.getProfile);
+//  router.put("/settings", ensureAuth, userController.updateSettings);
+
+// 📘 Swagger: Get all users
 /**
  * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of users
@@ -70,14 +81,17 @@ const auth = require("../middleware/auth");
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get("/", auth, userController.getAllUsers);
+router.get("/", ensureAuth, userController.getAllUsers);
 
+// 📘 Swagger: Get user by ID
 /**
  * @swagger
  * /api/users/{id}:
  *   get:
  *     summary: Get a user by ID
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -95,8 +109,9 @@ router.get("/", auth, userController.getAllUsers);
  *       404:
  *         description: User not found
  */
-router.get("/:id", auth, userController.getUserById);
+router.get("/:id", ensureAuth, userController.getUserById);
 
+// 📘 Swagger: Create user
 /**
  * @swagger
  * /api/users:
@@ -121,12 +136,15 @@ router.get("/:id", auth, userController.getUserById);
  */
 router.post("/", validate, userController.createUser);
 
+// 📘 Swagger: Update user
 /**
  * @swagger
  * /api/users/{id}:
  *   put:
  *     summary: Update a user
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -150,14 +168,17 @@ router.post("/", validate, userController.createUser);
  *       404:
  *         description: User not found
  */
-router.put("/:id", validate, userController.updateUser);
+router.put("/:id", ensureAuth, validate, userController.updateUser);
 
+// 📘 Swagger: Delete user
 /**
  * @swagger
  * /api/users/{id}:
  *   delete:
  *     summary: Delete a user
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -171,6 +192,6 @@ router.put("/:id", validate, userController.updateUser);
  *       404:
  *         description: User not found
  */
-router.delete("/:id", auth, userController.deleteUser);
+router.delete("/:id", ensureAuth, userController.deleteUser);
 
 module.exports = router;
