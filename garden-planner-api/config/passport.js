@@ -1,9 +1,9 @@
 const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GitHubStrategy = require("passport-github").Strategy;
 const User = require("../models/userModel");
 
 passport.serializeUser((user, done) => {
-  done(null, user.id); // MongoDB user id
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
@@ -16,24 +16,22 @@ passport.deserializeUser(async (id, done) => {
 });
 
 passport.use(
-  new GoogleStrategy(
+  new GitHubStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: "/api/auth/github/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Find or create user
-        let user = await User.findOne({ googleId: profile.id });
-
+        let user = await User.findOne({ githubId: profile.id });
         if (!user) {
           user = new User({
-            googleId: profile.id,
-            displayName: profile.displayName,
-            firstName: profile.name?.givenName,
-            lastName: profile.name?.familyName,
-            email: profile.emails && profile.emails[0]?.value,
+            githubId: profile.id,
+            displayName: profile.displayName || profile.username,
+            firstName: profile._json?.name?.split(" ")[0] || "",
+            lastName: profile._json?.name?.split(" ").slice(1).join(" ") || "",
+            email: profile.emails?.[0]?.value || "",
             role: "user",
           });
           await user.save();

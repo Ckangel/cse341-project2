@@ -1,92 +1,31 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/authController");
+const passport = require("../config/passport");
 const ensureAuth = require("../../middleware/ensureAuth");
 
-/**
- * @swagger
- * tags:
- *   name: Auth
- *   description: Authentication and user account management
- */
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
 
-/**
- * @swagger
- * /api/auth/register:
- *   post:
- *     summary: Register a new user
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *               displayName:
- *                 type: string
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *     responses:
- *       201:
- *         description: User registered successfully
- *       409:
- *         description: User already exists
- */
-router.post("/register", authController.registerUser);
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req, res) => {
+    // Redirect or respond with user info on success
+    res.redirect("/dashboard"); // Update as needed
+  }
+);
 
-/**
- * @swagger
- * /api/auth/login:
- *   post:
- *     summary: User login
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login successful
- *       401:
- *         description: Invalid credentials
- */
-router.post("/login", authController.loginUser);
+router.get("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.json({ message: "Logged out successfully" });
+  });
+});
 
-/**
- * @swagger
- * /api/auth/logout:
- *   post:
- *     summary: User logout
- *     tags: [Auth]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Logout successful
- *       401:
- *         description: Unauthorized
- */
-router.post("/logout", ensureAuth, authController.logoutUser);
+router.get("/profile", ensureAuth, (req, res) => {
+  res.json({ user: req.user });
+});
 
 module.exports = router;

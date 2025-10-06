@@ -18,7 +18,7 @@ const options = {
         cookieAuth: {
           type: "apiKey",
           in: "cookie",
-          name: "token",
+          name: "connect.sid",
         },
       },
       schemas: {
