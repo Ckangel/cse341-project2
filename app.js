@@ -7,6 +7,9 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 
+const passport = require("./garden-planner-api/config/passport");
+const session = require("express-session");
+
 const app = express();
 
 const path = require("path");
@@ -42,6 +45,18 @@ app.use(express.json());
 
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "your_session_secret_here",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.use("/api/users", require("./garden-planner-api/routes/userRoutes"));

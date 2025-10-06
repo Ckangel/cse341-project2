@@ -1,45 +1,49 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const User = require("../../models/userModel");
+const User = require("../models/userModel");
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user.id); // MongoDB user id
 });
+
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id).exec();
+    const user = await User.findById(id);
     done(null, user);
   } catch (err) {
-    done(err);
+    done(err, null);
   }
 });
 
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      callbackURL:
-        process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
         // Find or create user
         let user = await User.findOne({ googleId: profile.id });
+
         if (!user) {
-          user = await User.create({
+          user = new User({
             googleId: profile.id,
-            email: (profile.emails && profile.emails[0].value) || "",
-            displayName: profile.displayName || "",
-            firstName: (profile.name && profile.name.givenName) || "",
-            lastName: (profile.name && profile.name.familyName) || "",
+            displayName: profile.displayName,
+            firstName: profile.name?.givenName,
+            lastName: profile.name?.familyName,
+            email: profile.emails && profile.emails[0]?.value,
             role: "user",
           });
+          await user.save();
         }
-        return done(null, user);
+        done(null, user);
       } catch (err) {
-        return done(err);
+        done(err, null);
       }
     }
   )
 );
+
+module.exports = passport;

@@ -7,22 +7,25 @@ const options = {
     info: {
       title: "Garden Planner API",
       version: "1.0.0",
-      description: "API documentation for the Garden Planner Project",
+      description: "API documentation for the Garden Planner project",
     },
     servers: [
-      {
-        url: "http://localhost:5000", // Local development
-      },
-      {
-        url: "https://cse341-project2-8cpj.onrender.com", // Production deployed URL
-      },
+      { url: "http://localhost:5000" },
+      { url: "https://cse341-project2-8cpj.onrender.com" },
     ],
     components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: "apiKey",
+          in: "cookie",
+          name: "token",
+        },
+      },
       schemas: {
         User: {
           type: "object",
           properties: {
-            _id: { type: "string", description: "MongoDB ObjectId" },
+            _id: { type: "string" },
             googleId: { type: "string", nullable: true },
             email: { type: "string" },
             displayName: { type: "string", nullable: true },
@@ -45,15 +48,12 @@ const options = {
         Garden: {
           type: "object",
           properties: {
-            _id: { type: "string", description: "MongoDB ObjectId" },
+            _id: { type: "string" },
             name: { type: "string" },
             location: { type: "string" },
             size: { type: "number" },
             soilType: { type: "string" },
-            plants: {
-              type: "array",
-              items: { type: "string" },
-            },
+            plants: { type: "array", items: { type: "string" } },
             createdAt: { type: "string", format: "date-time" },
           },
           required: ["name", "location", "size", "soilType"],
@@ -67,29 +67,16 @@ const options = {
             location: { type: "string" },
             size: { type: "number" },
             soilType: { type: "string" },
-            plants: {
-              type: "array",
-              items: { type: "string" },
-            },
+            plants: { type: "array", items: { type: "string" } },
           },
-        },
-      },
-
-      securitySchemes: {
-        cookieAuth: {
-          type: "apiKey",
-          in: "cookie",
-          name: "token",
         },
       },
     },
   },
-
   apis: [
     path.join(__dirname, "./garden-planner-api/routes/*.js"),
     path.join(__dirname, "./garden-planner-api/controllers/*.js"),
   ],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
-module.exports = swaggerSpec;
+module.exports = swaggerJsdoc(options);

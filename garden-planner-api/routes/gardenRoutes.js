@@ -3,6 +3,9 @@ const router = express.Router();
 
 const gardenController = require("../controllers/gardenController");
 const ensureAuth = require("../../middleware/ensureAuth");
+
+router.post("/", ensureAuth, gardenController.createGarden);
+
 const ensureRole = require("../../middleware/ensureRole");
 
 /**
