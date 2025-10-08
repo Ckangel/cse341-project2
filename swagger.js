@@ -7,69 +7,22 @@ const options = {
     info: {
       title: "Garden Planner API",
       version: "1.0.0",
-      description: "API documentation for the Garden Planner project",
+      description: "API documentation",
     },
     servers: [
       { url: "http://localhost:5000" },
-      { url: "https://cse341-project2-8cpj.onrender.com" },
+      { url: "https://cse341-project2-8cpj.onrender.com/api-docs/" },
     ],
     components: {
       securitySchemes: {
         cookieAuth: {
           type: "apiKey",
           in: "cookie",
-          name: "connect.sid",
+          name: "token",
         },
       },
       schemas: {
-        User: {
-          type: "object",
-          properties: {
-            _id: { type: "string" },
-            googleId: { type: "string", nullable: true },
-            email: { type: "string" },
-            displayName: { type: "string", nullable: true },
-            firstName: { type: "string", nullable: true },
-            lastName: { type: "string", nullable: true },
-            role: { type: "string", enum: ["user", "admin"], default: "user" },
-            bio: { type: "string", nullable: true },
-            preferences: {
-              type: "object",
-              properties: {
-                notifications: { type: "boolean", default: true },
-                theme: { type: "string", default: "light" },
-              },
-            },
-            createdAt: { type: "string", format: "date-time" },
-          },
-          required: ["email"],
-        },
-
-        Garden: {
-          type: "object",
-          properties: {
-            _id: { type: "string" },
-            name: { type: "string" },
-            location: { type: "string" },
-            size: { type: "number" },
-            soilType: { type: "string" },
-            plants: { type: "array", items: { type: "string" } },
-            createdAt: { type: "string", format: "date-time" },
-          },
-          required: ["name", "location", "size", "soilType"],
-        },
-
-        GardenInput: {
-          type: "object",
-          required: ["name", "location", "size", "soilType"],
-          properties: {
-            name: { type: "string" },
-            location: { type: "string" },
-            size: { type: "number" },
-            soilType: { type: "string" },
-            plants: { type: "array", items: { type: "string" } },
-          },
-        },
+        // Your User, Garden schemas here...
       },
     },
   },
@@ -79,4 +32,5 @@ const options = {
   ],
 };
 
-module.exports = swaggerJsdoc(options);
+const swaggerSpec = swaggerJsdoc(options);
+module.exports = swaggerSpec;
