@@ -1,28 +1,37 @@
-const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const express = require("express");
+const router = express.Router();
+const passport = require("../config/passport");
+const ensureAuth = require("../middleware/ensureAuth");
 
-module.exports = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
-  if (!token) return res.status(401).json({ error: "No token provided" });
+// Start GitHub OAuth login
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
 
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    req.user = {
-      id: payload.sub,
-      email: payload.email,
-      name: payload.name,
-      picture: payload.picture,
-      role: "user", // You can map roles from your DB if needed
-    };
-
-    next();
-  } catch (err) {
-    console.error("OAuth verification failed:", err.message);
-    res.status(403).json({ error: "Invalid or expired token" });
+// GitHub OAuth callback
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req, res) => {
+    // On success
+    res.redirect("/dashboard"); // Or send JSON response
   }
-};
+);
+
+// Logout route
+router.get("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.json({ message: "Logged out successfully" });
+  });
+});
+
+// Example protected profile route
+router.get("/profile", ensureAuth, (req, res) => {
+  res.json({ user: req.user });
+});
+
+module.exports = router;
