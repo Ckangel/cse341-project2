@@ -3,9 +3,6 @@ const router = express.Router();
 
 const gardenController = require("../controllers/gardenController");
 const ensureAuth = require("../../middleware/ensureAuth");
-
-router.post("/", ensureAuth, gardenController.createGarden);
-
 const ensureRole = require("../../middleware/ensureRole");
 
 /**
@@ -21,10 +18,10 @@ const ensureRole = require("../../middleware/ensureRole");
  *   get:
  *     summary: Retrieve all gardens (public)
  *     tags: [Gardens]
- *     security: []  # no auth needed
+ *     security: []
  *     responses:
  *       200:
- *         description: List of all gardens
+ *         description: List of gardens
  *         content:
  *           application/json:
  *             schema:
@@ -40,14 +37,14 @@ router.get("/", gardenController.getAllGardens);
  *   get:
  *     summary: Get a garden by ID (public)
  *     tags: [Gardens]
- *     security: []  # no auth needed
+ *     security: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Garden ID
  *         schema:
  *           type: string
- *         description: Garden ID
  *     responses:
  *       200:
  *         description: Garden object
@@ -90,7 +87,7 @@ router.post("/", ensureAuth, gardenController.createGarden);
  * @swagger
  * /api/gardens/{id}:
  *   put:
- *     summary: Update garden by ID
+ *     summary: Update a garden by ID
  *     tags: [Gardens]
  *     security:
  *       - cookieAuth: []
@@ -98,9 +95,9 @@ router.post("/", ensureAuth, gardenController.createGarden);
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Garden ID
  *         schema:
  *           type: string
- *         description: Garden ID
  *     requestBody:
  *       required: true
  *       content:
@@ -133,9 +130,9 @@ router.put("/:id", ensureAuth, gardenController.updateGarden);
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Garden ID
  *         schema:
  *           type: string
- *         description: Garden ID
  *     responses:
  *       200:
  *         description: Garden deleted

@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-// Middleware
-const ensureAuth = require("../../middleware/Auth");
-const validate = require("../../middleware/validate");
-
-// Controller
 const userController = require("../controllers/userController");
+const ensureAuth = require("../../middleware/ensureAuth");
+const ensureRole = require("../../middleware/ensureRole");
+const validate = require("../../middleware/validate");
 
 /**
  * @swagger
@@ -15,15 +13,13 @@ const userController = require("../controllers/userController");
  *   description: User management and CRUD operations
  */
 
-// Public GET routes (no auth required)
-
 /**
  * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users (public)
  *     tags: [Users]
- *     security: []  # no auth needed
+ *     security: []
  *     responses:
  *       200:
  *         description: List of users
@@ -46,10 +42,10 @@ router.get("/", userController.getAllUsers);
  *     parameters:
  *       - in: path
  *         name: id
+ *         description: User ID
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The user ID
  *     responses:
  *       200:
  *         description: User object
@@ -62,14 +58,14 @@ router.get("/", userController.getAllUsers);
  */
 router.get("/:id", userController.getUserById);
 
-// Protected routes
-
 /**
  * @swagger
  * /api/users:
  *   post:
  *     summary: Create a new user
  *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -92,15 +88,17 @@ router.post("/", validate, userController.createUser);
  * @swagger
  * /api/users/{id}:
  *   put:
- *     summary: Update a user
+ *     summary: Update a user by ID
  *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         description: User ID
  *         required: true
  *         schema:
  *           type: string
- *         description: User ID
  *     requestBody:
  *       required: true
  *       content:
@@ -123,15 +121,17 @@ router.put("/:id", ensureAuth, validate, userController.updateUser);
  * @swagger
  * /api/users/{id}:
  *   delete:
- *     summary: Delete a user
+ *     summary: Delete a user by ID
  *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         description: User ID
  *         required: true
  *         schema:
  *           type: string
- *         description: User ID
  *     responses:
  *       200:
  *         description: User deleted
