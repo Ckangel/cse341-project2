@@ -1,12 +1,9 @@
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
-const JWT_EXPIRES_IN = "1d";
 const SALT_ROUNDS = 10;
 
-// Register user with hashed password
+// (Optional) Register user with hashed password if you still support local registration
 exports.registerUser = async (req, res) => {
   try {
     const { email, password, displayName, firstName, lastName } = req.body;
@@ -35,40 +32,16 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// Login user and set JWT cookie
-exports.loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// For GitHub OAuth, login is handled via Passport strategy and sessions.
+// Thus, 'loginUser' endpoint is not needed.
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+// Logout clears the session cookie and calls passport logout
+exports.logoutUser = (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
     }
-
-    const passwordValid = await bcrypt.compare(password, user.password);
-    if (!passwordValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const payload = { id: user._id, email: user.email, role: user.role };
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    res.json({ message: "Login successful" });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ message: "Server error during login" });
-  }
-};
-
-// Logout by clearing JWT cookie
-exports.logoutUser = (req, res) => {
-  res.clearCookie("token");
-  res.json({ message: "Logged out successfully" });
+    res.clearCookie("connect.sid"); // default session cookie, adjust if changed
+    res.json({ message: "Logged out successfully" });
+  });
 };

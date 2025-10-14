@@ -1,23 +1,24 @@
 require("dotenv").config();
-console.log("🌱 Garden Planner API initializing...");
+console.log("🌱 Garden Planner API initializing");
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./swagger");
+const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("./garden-planner-api/config/passport");
-const cookieParser = require("cookie-parser");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
+const path = require("path");
 
 const app = express();
 
-const path = require("path");
+// Serve Swagger JSON directly
 app.get("/swagger.json", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "swagger_output.json"));
+  res.sendFile(path.resolve(__dirname, "swagger.json"));
 });
 
-// MongoDB Connection
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -45,15 +46,21 @@ app.use(express.json());
 
 app.use(cookieParser());
 
+// Session config, adjust cookie settings per environment
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your_session_secret",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === "production" },
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "lax",
+    },
   })
 );
 
+// Initialize Passport and sessions
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -62,9 +69,8 @@ app.use("/api/users", require("./garden-planner-api/routes/userRoutes"));
 app.use("/api/gardens", require("./garden-planner-api/routes/gardenRoutes"));
 app.use("/api/auth", require("./garden-planner-api/routes/authRoutes"));
 
-// Swagger UI and swagger.json endpoint
+// Swagger UI setup
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get("/swagger.json", (req, res) => res.status(200).json(swaggerSpec));
 
 // Health Checks
 app.get("/api/health", (req, res) => {
@@ -76,11 +82,16 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/db-status", (req, res) => {
-  const states = ["disconnected", "connected", "connecting", "disconnecting"];
-  res.status(200).json({ status: states[mongoose.connection.readyState] });
+  const stateNames = [
+    "disconnected",
+    "connected",
+    "connecting",
+    "disconnecting",
+  ];
+  res.status(200).json({ status: stateNames[mongoose.connection.readyState] });
 });
 
-// Global error handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({ error: "Internal Server Error" });

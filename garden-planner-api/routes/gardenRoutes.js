@@ -41,8 +41,8 @@ router.get("/", gardenController.getAllGardens);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         description: Garden ID
+ *         required: true
  *         schema:
  *           type: string
  *     responses:
@@ -94,8 +94,8 @@ router.post("/", ensureAuth, gardenController.createGarden);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         description: Garden ID
+ *         required: true
  *         schema:
  *           type: string
  *     requestBody:
@@ -129,8 +129,8 @@ router.put("/:id", ensureAuth, gardenController.updateGarden);
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         description: Garden ID
+ *         required: true
  *         schema:
  *           type: string
  *     responses:

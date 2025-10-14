@@ -3,7 +3,7 @@
   "info": {
     "title": "Garden Planner API",
     "version": "1.0.0",
-    "description": "API documentation for the Garden Planner Project"
+    "description": "API documentation for Garden Planner"
   },
   "servers": [
     {
@@ -14,15 +14,21 @@
     }
   ],
   "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid"
+      }
+    },
     "schemas": {
       "User": {
         "type": "object",
         "properties": {
           "_id": {
-            "type": "string",
-            "description": "MongoDB ObjectId"
+            "type": "string"
           },
-          "googleId": {
+          "githubId": {
             "type": "string",
             "nullable": true
           },
@@ -30,16 +36,13 @@
             "type": "string"
           },
           "displayName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "role": {
             "type": "string",
@@ -49,23 +52,6 @@
             ],
             "default": "user"
           },
-          "bio": {
-            "type": "string",
-            "nullable": true
-          },
-          "preferences": {
-            "type": "object",
-            "properties": {
-              "notifications": {
-                "type": "boolean",
-                "default": true
-              },
-              "theme": {
-                "type": "string",
-                "default": "light"
-              }
-            }
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -74,430 +60,9 @@
         "required": [
           "email"
         ]
-      },
-      "Garden": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "description": "MongoDB ObjectId"
-          },
-          "name": {
-            "type": "string"
-          },
-          "location": {
-            "type": "string"
-          },
-          "size": {
-            "type": "number"
-          },
-          "soilType": {
-            "type": "string"
-          },
-          "plants": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "name",
-          "location",
-          "size",
-          "soilType"
-        ]
-      },
-      "GardenInput": {
-        "type": "object",
-        "required": [
-          "name",
-          "location",
-          "size",
-          "soilType"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "location": {
-            "type": "string"
-          },
-          "size": {
-            "type": "number"
-          },
-          "soilType": {
-            "type": "string"
-          },
-          "plants": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "cookieAuth": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "token"
       }
     }
   },
-  "paths": {
-    "/api/gardens": {
-      "get": {
-        "summary": "Retrieve all gardens (public)",
-        "tags": [
-          "Gardens"
-        ],
-        "security": [],
-        "responses": {
-          "200": {
-            "description": "List of all gardens",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Garden"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create a new garden",
-        "tags": [
-          "Gardens"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GardenInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Garden created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Garden"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/gardens/{id}": {
-      "get": {
-        "summary": "Get a garden by ID (public)",
-        "tags": [
-          "Gardens"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Garden ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Garden object",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Garden"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Garden not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update garden by ID",
-        "tags": [
-          "Gardens"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Garden ID"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GardenInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Garden updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Garden"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Garden not found"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete a garden by ID (admin only)",
-        "tags": [
-          "Gardens"
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Garden ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Garden deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden (admin only)"
-          },
-          "404": {
-            "description": "Garden not found"
-          }
-        }
-      }
-    },
-    "/api/users": {
-      "get": {
-        "summary": "Get all users (public)",
-        "tags": [
-          "Users"
-        ],
-        "security": [],
-        "responses": {
-          "200": {
-            "description": "List of users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create a new user",
-        "tags": [
-          "Users"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "User created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error"
-          }
-        }
-      }
-    },
-    "/api/users/{id}": {
-      "get": {
-        "summary": "Get a user by ID (public)",
-        "tags": [
-          "Users"
-        ],
-        "security": [],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "The user ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User object",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update a user",
-        "tags": [
-          "Users"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "User ID"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete a user",
-        "tags": [
-          "Users"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "User ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User deleted"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        }
-      }
-    }
-  },
-  "tags": [
-    {
-      "name": "Gardens",
-      "description": "Garden management"
-    },
-    {
-      "name": "Users",
-      "description": "User management and CRUD operations"
-    }
-  ]
+  "paths": {},
+  "tags": []
 }
